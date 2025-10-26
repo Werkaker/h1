@@ -1,7 +1,16 @@
 local plr = game.Players.LocalPlayer
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+print("[Debug] Starting script...")
+local success, Library = pcall(function()
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+end)
+if not success then
+    print("[Error] Failed to load Kavo UI Library:", Library)
+    return
+end
+print("[Debug] Kavo UI loaded successfully")
 -- documents https://xheptcofficial.gitbook.io/kavo-library#update
 local Window = Library.CreateLib("CHEATER.FUN | Dragon Soul - Anime Adventure Script", "DarkTheme")
+print("[Debug] Window created")
 local Tab = Window:NewTab("Farming")
 local Misc = Window:NewTab("Misc")
 local Section = Tab:NewSection("Enemy Farm")
@@ -99,8 +108,10 @@ end
 end
 end)
 function findEnemy()
+    print("[Debug] Searching for enemy. Selected type:", enemyName)
     -- Jeśli wybrano "All", zwróć najbliższego żywego przeciwnika
     if enemyName == "All" or enemyName == "" then
+        print("[Debug] Searching for nearest enemy")
         local nearest = nil
         local nearestDist = math.huge
         if not plr.Character or not plr.Character.PrimaryPart then
@@ -151,8 +162,10 @@ while task.wait() do
     end)
     end
     if farming then
+        print("[Debug] Farming is active, searching for enemy...")
         local enemy = findEnemy()
         if enemy then
+            print("[Debug] Found enemy:", enemy.Name)
             spawn(function()
                 while farming and enemy and enemy.PrimaryPart and enemy:GetAttribute("Dead") == false and (enemyName == "All" or enemy.Name == enemyName) do
                     task.wait()
