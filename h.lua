@@ -1,69 +1,25 @@
 local plr = game.Players.LocalPlayer
 print("[Debug] Starting script...")
 
--- Próba załadowania biblioteki UI (alternatywne źródło)
-local Library
-local success, result = pcall(function()
-    return loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
-end)
+-- Używamy najprostszej, stabilnej biblioteki UI
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wally2", true))()
 
-if not success then
-    print("[Error] Failed to load UI Library (first attempt):", result)
-    -- Próba alternatywnej biblioteki
-    success, result = pcall(function()
-        return loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
-    end)
-    if not success then
-        print("[Error] Failed to load backup UI Library:", result)
-        return
-    end
-    Library = result
-else
-    Library = result
+if not Library then
+    print("[Error] Failed to load UI Library")
+    return
 end
 
 print("[Debug] UI Library loaded successfully")
 
--- Zabezpieczenie tworzenia okna
-local Window
-success, result = pcall(function()
-    return Library:MakeWindow({
-        Name = "Dragon Soul - Anime Adventure Script",
-        HidePremium = false,
-        SaveConfig = true,
-        ConfigFolder = "DragonSoulConfig"
-    })
-end)
-
-if not success then
-    print("[Error] Failed to create window:", result)
-    return
-end
-
-Window = result
-print("[Debug] Window created successfully")
+-- Tworzenie okna
+local Window = Library:CreateWindow("Dragon Soul Farm")
 print("[Debug] Window created")
--- Tworzenie zakładek z zabezpieczeniem
-local Tab, Misc
-success, result = pcall(function()
-    local farmingTab = Window:AddTab("Farming")
-    local miscTab = Window:AddTab("Misc")
-    return {farmingTab, miscTab}
-end)
 
-if not success then
-    print("[Error] Failed to create tabs:", result)
-    return
-end
+-- Tworzenie zakładek
+local Tab = Window:CreateFolder("Farming")
+local Misc = Window:CreateFolder("Misc")
+print("[Debug] Tabs created")
 
-Tab = result[1]
-Misc = result[2]
-print("[Debug] Tabs created successfully")
-
-local Section = Tab:AddSection({
-    Name = "Enemy Farm"
-})
---Section:NewLabel("LabelText")
 local dd
 function updateDropDown()
     local updatedList = {}
@@ -82,21 +38,21 @@ function updateDropDown()
     dd:Refresh(updatedList)
 end
 local farming = false
-local tog = Section:NewToggle("Farming", "Start the whole farming process", function(state)
+local tog = Tab:Toggle("Farming", function(state)
     farming = state
 end)
-Section:NewKeybind("KeybindText", "KeybindInfo", Enum.KeyCode.Plus, function()
-    farming = not farming
-end)
+
 local range = 5
-Section:NewSlider("Range", "How far you are from the enemy Upwards", 15, 0, function(s) -- 500 (MaxValue) | 0 (MinValue)
-    range = s
+Tab:Slider("Range",0,15,function(value)
+    range = value
 end)
-Section:NewButton("Update Enemy List", "Specific for this game, due to loading NPCs", function()
+
+Tab:Button("Update Enemy List",function()
     updateDropDown()
 end)
+
 local enemyName = ""
-dd = Section:NewDropdown("Enemy", "List of current Enemies loaded", {}, function(currentOption)
+dd = Tab:Dropdown("Select Enemy",{""},function(currentOption)
     enemyName = currentOption
 end)
 updateDropDown()
@@ -110,25 +66,26 @@ function updateDropDown2()
     end
     dd2:Refresh(updatedList)
 end
-local Questsos = Tab:NewSection("Auto Quest")
 local questing = false
-Questsos:NewToggle("Auto Quest", "Automatically Start the Quest", function(state)
+Tab:Toggle("Auto Quest",function(state)
     questing = state
 end)
-Questsos:NewButton("Update Quest List", "Specific for this game, due to loading NPCs", function()
+
+Tab:Button("Update Quest List",function()
     updateDropDown2()
 end)
+
 local questNPC = ""
-dd2 = Questsos:NewDropdown("Quests", "List of current Quests loaded", {}, function(currentOption)
+dd2 = Tab:Dropdown("Select Quest",{},function(currentOption)
     questNPC = currentOption
 end)
 updateDropDown2()
-local miscTab = Misc:NewSection("Random Stuff ngl")
 local revF = false
-miscTab:NewToggle("Auto Reveal Fragments", "Automatically Reveals the ? Fragment", function(state)
+Misc:Toggle("Auto Reveal Fragments",function(state)
     revF = state
 end)
-miscTab:NewButton("Reveal Soul Orbss", "Shows the Names of the 5 Orbs in Soul Wish", function()
+
+Misc:Button("Reveal Soul Orbs",function()
     for i, v in pairs(workspace.Camera:GetChildren()) do
     if v.Name == "SelectableEffect" and v.Glow:FindFirstChild("BillboardGui") then
         v.Glow.BillboardGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
