@@ -1,19 +1,68 @@
 local plr = game.Players.LocalPlayer
 print("[Debug] Starting script...")
-local success, Library = pcall(function()
-    return loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+
+-- Próba załadowania biblioteki UI (alternatywne źródło)
+local Library
+local success, result = pcall(function()
+    return loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
 end)
+
 if not success then
-    print("[Error] Failed to load Kavo UI Library:", Library)
+    print("[Error] Failed to load UI Library (first attempt):", result)
+    -- Próba alternatywnej biblioteki
+    success, result = pcall(function()
+        return loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
+    end)
+    if not success then
+        print("[Error] Failed to load backup UI Library:", result)
+        return
+    end
+    Library = result
+else
+    Library = result
+end
+
+print("[Debug] UI Library loaded successfully")
+
+-- Zabezpieczenie tworzenia okna
+local Window
+success, result = pcall(function()
+    return Library:MakeWindow({
+        Name = "Dragon Soul - Anime Adventure Script",
+        HidePremium = false,
+        SaveConfig = true,
+        ConfigFolder = "DragonSoulConfig"
+    })
+end)
+
+if not success then
+    print("[Error] Failed to create window:", result)
     return
 end
-print("[Debug] Kavo UI loaded successfully")
--- documents https://xheptcofficial.gitbook.io/kavo-library#update
-local Window = Library.CreateLib("CHEATER.FUN | Dragon Soul - Anime Adventure Script", "DarkTheme")
+
+Window = result
+print("[Debug] Window created successfully")
 print("[Debug] Window created")
-local Tab = Window:NewTab("Farming")
-local Misc = Window:NewTab("Misc")
-local Section = Tab:NewSection("Enemy Farm")
+-- Tworzenie zakładek z zabezpieczeniem
+local Tab, Misc
+success, result = pcall(function()
+    local farmingTab = Window:AddTab("Farming")
+    local miscTab = Window:AddTab("Misc")
+    return {farmingTab, miscTab}
+end)
+
+if not success then
+    print("[Error] Failed to create tabs:", result)
+    return
+end
+
+Tab = result[1]
+Misc = result[2]
+print("[Debug] Tabs created successfully")
+
+local Section = Tab:AddSection({
+    Name = "Enemy Farm"
+})
 --Section:NewLabel("LabelText")
 local dd
 function updateDropDown()
@@ -197,4 +246,3 @@ while task.wait() do
     end
 end
 
-Source: https://cheater.fun/hacks_roblox/9889-dragon-soul-anime-adventure-script.html
