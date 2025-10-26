@@ -154,7 +154,7 @@ while task.wait() do
         local enemy = findEnemy()
         if enemy then
             spawn(function()
-                while farming and enemy and enemy.Name == enemyName and enemy.PrimaryPart and enemy:GetAttribute("Dead") == false do
+                while farming and enemy and enemy.PrimaryPart and enemy:GetAttribute("Dead") == false and (enemyName == "All" or enemy.Name == enemyName) do
                     task.wait()
                     pcall(function()
                         plr.Character:MoveTo(enemy.PrimaryPart.Position + Vector3.new(0, range, 0))
@@ -163,7 +163,7 @@ while task.wait() do
             end)
             repeat task.wait(1.3)
                     for i = 1, 7 do
-                        if enemy and enemy.PrimaryPart and farming and enemy:GetAttribute("Dead") == false and enemy.Name == enemyName then
+                        if enemy and enemy.PrimaryPart and farming and enemy:GetAttribute("Dead") == false and (enemyName == "All" or enemy.Name == enemyName) then
                         game:GetService("ReplicatedStorage").Events.TryAttack:FireServer({
                             ["Victim"] = enemy,
                             ["Type"] = "Light",
@@ -179,7 +179,7 @@ while task.wait() do
                         task.wait(.08)
                     end
                 end
-            until not enemy or enemy:GetAttribute("Dead") == true or farming == false or enemy.Name ~= enemyName
+            until not enemy or enemy:GetAttribute("Dead") == true or farming == false or (enemyName ~= "All" and enemy.Name ~= enemyName)
         end
     end
 end
