@@ -1,23 +1,33 @@
 local plr = game.Players.LocalPlayer
 print("[Debug] Starting script...")
 
--- Używamy najprostszej, stabilnej biblioteki UI
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wally2", true))()
+-- Używamy Mercury UI (bardzo stabilna)
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/deeeity/mercury-lib/master/src.lua"))()
 
 if not Library then
-    print("[Error] Failed to load UI Library")
+    print("[Error] Failed to load Mercury UI Library")
     return
 end
 
 print("[Debug] UI Library loaded successfully")
 
--- Tworzenie okna
-local Window = Library:CreateWindow("Dragon Soul Farm")
-print("[Debug] Window created")
+-- Tworzenie GUI
+local GUI = Library:Create{
+    Name = "Dragon Soul Farm",
+    Size = UDim2.fromOffset(600, 400),
+    Theme = Library.Themes.Dark,
+    Link = "https://github.com/deeeity/mercury-lib"
+}
 
 -- Tworzenie zakładek
-local Tab = Window:CreateFolder("Farming")
-local Misc = Window:CreateFolder("Misc")
+local Tab = GUI:Tab{
+    Name = "Farming",
+    Icon = "rbxassetid://8569322835"
+}
+local Misc = GUI:Tab{
+    Name = "Misc",
+    Icon = "rbxassetid://8569322835"
+}
 print("[Debug] Tabs created")
 
 local dd
@@ -38,21 +48,41 @@ function updateDropDown()
     dd:Refresh(updatedList)
 end
 local farming = false
-local tog = Tab:Toggle("Farming", function(state)
-    farming = state
-end)
+Tab:Toggle{
+    Name = "Farming",
+    StartingState = false,
+    Description = "Start/Stop farming",
+    Callback = function(state)
+        farming = state
+    end
+}
 
 local range = 5
-Tab:Slider("Range",0,15,function(value)
-    range = value
-end)
+Tab:Slider{
+    Name = "Range",
+    Default = 5,
+    Min = 0,
+    Max = 15,
+    Callback = function(value)
+        range = value
+    end
+}
 
-Tab:Button("Update Enemy List",function()
-    updateDropDown()
-end)
+Tab:Button{
+    Name = "Update Enemy List",
+    Description = "Refresh the enemy list",
+    Callback = function()
+        updateDropDown()
+    end
+}
 
 local enemyName = ""
-dd = Tab:Dropdown("Select Enemy",{""},function(currentOption)
+dd = Tab:Dropdown{
+    Name = "Select Enemy",
+    Description = "Choose enemy to farm",
+    Default = "",
+    Options = {""},
+    Callback = function(currentOption)
     enemyName = currentOption
 end)
 updateDropDown()
