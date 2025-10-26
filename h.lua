@@ -1,33 +1,31 @@
 local plr = game.Players.LocalPlayer
 print("[Debug] Starting script...")
 
--- Używamy Mercury UI (bardzo stabilna)
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/deeeity/mercury-lib/master/src.lua"))()
+-- Używamy bardzo prostej biblioteki UI
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/MaterialLua/master/Module.lua"))()
 
 if not Library then
-    print("[Error] Failed to load Mercury UI Library")
+    print("[Error] Failed to load UI Library")
     return
 end
 
 print("[Debug] UI Library loaded successfully")
 
--- Tworzenie GUI
-local GUI = Library:Create{
-    Name = "Dragon Soul Farm",
-    Size = UDim2.fromOffset(600, 400),
-    Theme = Library.Themes.Dark,
-    Link = "https://github.com/deeeity/mercury-lib"
-}
+local GUI = Library.Load({
+    Title = "Dragon Soul Farm",
+    Style = 3,
+    SizeX = 400,
+    SizeY = 300,
+    Theme = "Dark"
+})
 
 -- Tworzenie zakładek
-local Tab = GUI:Tab{
-    Name = "Farming",
-    Icon = "rbxassetid://8569322835"
-}
-local Misc = GUI:Tab{
-    Name = "Misc",
-    Icon = "rbxassetid://8569322835"
-}
+local Tab = GUI.New({
+    Title = "Farming"
+})
+local Misc = GUI.New({
+    Title = "Misc"
+})
 print("[Debug] Tabs created")
 
 local dd
@@ -48,39 +46,35 @@ function updateDropDown()
     dd:Refresh(updatedList)
 end
 local farming = false
-Tab:Toggle{
-    Name = "Farming",
-    StartingState = false,
-    Description = "Start/Stop farming",
+Tab.Toggle({
+    Text = "Farming",
     Callback = function(state)
         farming = state
-    end
-}
+    end,
+    Enabled = false
+})
 
 local range = 5
-Tab:Slider{
-    Name = "Range",
-    Default = 5,
-    Min = 0,
-    Max = 15,
+Tab.Slider({
+    Text = "Range",
     Callback = function(value)
         range = value
-    end
-}
+    end,
+    Min = 0,
+    Max = 15,
+    Def = 5
+})
 
-Tab:Button{
-    Name = "Update Enemy List",
-    Description = "Refresh the enemy list",
+Tab.Button({
+    Text = "Update Enemy List",
     Callback = function()
         updateDropDown()
     end
-}
+})
 
 local enemyName = ""
-dd = Tab:Dropdown{
-    Name = "Select Enemy",
-    Description = "Choose enemy to farm",
-    Default = "",
+dd = Tab.Dropdown({
+    Text = "Select Enemy",
     Options = {""},
     Callback = function(currentOption)
     enemyName = currentOption
@@ -97,25 +91,41 @@ function updateDropDown2()
     dd2:Refresh(updatedList)
 end
 local questing = false
-Tab:Toggle("Auto Quest",function(state)
-    questing = state
-end)
+Tab.Toggle({
+    Text = "Auto Quest",
+    Callback = function(state)
+        questing = state
+    end,
+    Enabled = false
+})
 
-Tab:Button("Update Quest List",function()
-    updateDropDown2()
-end)
+Tab.Button({
+    Text = "Update Quest List",
+    Callback = function()
+        updateDropDown2()
+    end
+})
 
 local questNPC = ""
-dd2 = Tab:Dropdown("Select Quest",{},function(currentOption)
+dd2 = Tab.Dropdown({
+    Text = "Select Quest",
+    Options = {},
+    Callback = function(currentOption)
     questNPC = currentOption
 end)
 updateDropDown2()
 local revF = false
-Misc:Toggle("Auto Reveal Fragments",function(state)
-    revF = state
-end)
+Misc.Toggle({
+    Text = "Auto Reveal Fragments",
+    Callback = function(state)
+        revF = state
+    end,
+    Enabled = false
+})
 
-Misc:Button("Reveal Soul Orbs",function()
+Misc.Button({
+    Text = "Reveal Soul Orbs",
+    Callback = function()
     for i, v in pairs(workspace.Camera:GetChildren()) do
     if v.Name == "SelectableEffect" and v.Glow:FindFirstChild("BillboardGui") then
         v.Glow.BillboardGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
